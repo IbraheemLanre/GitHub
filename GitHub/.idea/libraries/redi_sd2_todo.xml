@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="redi-sd2-todo">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/redi-sd2-todo/redi-sd2-todo.zip!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
