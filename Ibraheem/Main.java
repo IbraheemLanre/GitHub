@@ -1,136 +1,79 @@
 package com.Ibraheem;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Scanner;
 
 public class Main {
-
-    private static Scanner scanner = new Scanner(System.in);
-    private static MobilePhone mobilePhone = new MobilePhone("0034");
+    private static Map<Integer, Location> locations = new HashMap<Integer, Location>();
 
     public static void main(String[] args) {
-// Create a program that implements a simple mobile phone with the following capabilities.
-        // Able to store, modify, remove and query contact names.
-        // You will want to create a separate class for Contacts (name and phone number).
-        // Create a master class (MobilePhone) that holds the ArrayList of Contacts
-        // The MobilePhone class has the functionality listed above.
-        // Add a menu of options that are available.
-        // Options:  Quit, print list of contacts, add new contact, update existing contact, remove contact
-        // and search/find contact.
-        // When adding or updating be sure to check if the contact already exists (use name)
-        // Be sure not to expose the inner workings of the Arraylist to MobilePhone
-        // e.g. no ints, no .get(i) etc
-        // MobilePhone should do everything with Contact objects only.
+        Scanner scanner = new Scanner(System.in);
+
+        locations.put(0, new Location(0, "You are sitting in front of a computer learning Java"));
+        locations.put(1, new Location(1, "You are standing at the end of a road before a small brick building"));
+        locations.put(2, new Location(2, "You are at the top of a hill"));
+        locations.put(3, new Location(3, "You are inside a building, a well house for a small spring"));
+        locations.put(4, new Location(4, "You are in a valley beside a stream"));
+        locations.put(5, new Location(5, "You are in the forest"));
+
+        locations.get(1).addExit("W", 2);
+        locations.get(1).addExit("E", 3);
+        locations.get(1).addExit("S", 4);
+        locations.get(1).addExit("N", 5);
+
+        locations.get(2).addExit("N", 5);
 
 
-        boolean quit = false;
-        startPhone();
-        printActions();
+        locations.get(3).addExit("W", 1);
 
-        while(!quit) {
-            System.out.println("\nEnter action: (6 to show available actions)");
-            int action = scanner.nextInt();
-            scanner.nextLine();
 
-            switch (action) {
-                case 0:
-                    System.out.println("\nShutting down ...");
-                    quit = true;
-                    break;
-                case 1:
-                    mobilePhone.printContacts();
-                    break;
-                case 2:
-                    addNewContact();
-                    break;
-                case 3:
-                    updateContact();
-                    break;
-                case 4:
-                    removeContact();
-                    break;
-                case 5:
-                    queryContact();
-                    break;
-                case 6:
-                    printActions();
-                    break;
+        locations.get(4).addExit("N", 1);
+        locations.get(4).addExit("W", 2);
 
+
+        locations.get(5).addExit("S", 1);
+        locations.get(5).addExit("W", 2);
+
+        Map<String, String> vocabulary = new HashMap<String, String>();
+        vocabulary.put("QUIT", "Q");
+        vocabulary.put("NORTH", "N");
+        vocabulary.put("SOUTH", "S");
+        vocabulary.put("WEST", "W");
+        vocabulary.put("EAST", "E");
+
+
+
+        int loc = 1;
+        while(true) {
+            System.out.println(locations.get(loc).getDescription());
+            if(loc == 0) {
+                break;
+            }
+
+            Map<String, Integer> exits = locations.get(loc).getExits();
+            System.out.println("Available exits are ");
+            for (String exit: exits.keySet()) {
+                System.out.println(exit + " ");
+            }
+            System.out.println();
+
+            String direction = scanner.nextLine().toUpperCase();
+            if (direction.length() > 1) {
+                String[] words = direction.split(" ");
+                for (String word: words) {
+                    if (vocabulary.containsKey(word)) {
+                        direction = vocabulary.get(word);
+                        break;
+                    }
+                }
+            }
+
+            if(exits.containsKey(direction)) {
+                loc = exits.get(direction);
+            }else {
+                System.out.println("You cannot go in that direction");
             }
         }
-    }
-
-    private static void addNewContact() {
-        System.out.println("Enter new contact name: ");
-        String name = scanner.nextLine();
-        System.out.println("Enter phone number: ");
-        String phone = scanner.nextLine();
-        Contacts newContact = Contacts.createContact(name, phone);
-        if (mobilePhone.addNewContact(newContact)) {
-            System.out.println("New contact added: name = " + name + ", phone = " + phone);
-        }else {
-            System.out.println("Cannot add, " + name + " already on file.");
-        }
-    }
-
-    private static void updateContact() {
-        System.out.println("Enter existing contact name: ");
-        String name = scanner.nextLine();
-        Contacts existingContact = mobilePhone.queryContact(name);
-        if(existingContact == null) {
-            System.out.println("Contact not found.");
-            return;
-        }
-        System.out.println("Enter new contact name: ");
-        String newName = scanner.nextLine();
-        System.out.println("Enter new contact phone number: ");
-        String newNumber = scanner.nextLine();
-        Contacts newContact = Contacts.createContact(newName, newNumber);
-        if(mobilePhone.updateContact(existingContact, newContact)) {
-            System.out.println("Successfully Updated.");
-        }else {
-            System.out.println("Error updating contact.");
-        }
-    }
-
-    private static void removeContact() {
-        System.out.println("Enter existing contact name: ");
-        String name = scanner.nextLine();
-        Contacts existingContact = mobilePhone.queryContact(name);
-        if (existingContact == null) {
-            System.out.println("Contact not found.");
-            return;
-        }
-        if(mobilePhone.removeContact(existingContact)) {
-            System.out.println("Successfully deleted.");
-        }else {
-            System.out.println("Error deleting contact");
-        }
-    }
-
-    private static void queryContact() {
-        System.out.println("Enter existing contact name: ");
-        String name = scanner.nextLine();
-        Contacts existingContact = mobilePhone.queryContact(name);
-        if (existingContact == null) {
-            System.out.println("Contact not found.");
-            return;
-        }
-        System.out.println("Name: " + existingContact.getName() + ", phone number is " + existingContact.getPhoneNumber());
-    }
-
-    private static void startPhone() {
-        System.out.println("Starting phone...");
-    }
-
-    private static void printActions() {
-        System.out.println("\nAvailable actions: \npress");
-        System.out.println("0 - to shutdown\n" +
-                           "1 - to print contacts\n" +
-                            "2 - to add a new contact\n" +
-                            "3 - to update contacts\n" +
-                            "4 - to remove existing contacts\n" +
-                            "5  - query if a contact exists\n" +
-                            "6 - to print a list of available actions.");
-        System.out.println("Choose your action: ");
     }
 }
