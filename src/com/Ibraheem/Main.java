@@ -1,147 +1,100 @@
 package com.Ibraheem;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Scanner;
 
 public class Main {
     private static Scanner scanner = new Scanner(System.in);
-    private static ArrayList<Album> albums = new ArrayList<Album>();
+    private static GroceryList groceryList = new GroceryList();
 
     public static void main(String[] args) {
+        boolean quit = false;
+        int choice = 0;
 
-        //Create first album
-        Album album = new Album("Talk", "Khalid");
-        album.addNewSong("Talk", 3.43);
-        album.addNewSong("Eleven", 3.52);
-        album.addNewSong("Better", 4.11);
-        album.addNewSong("Saturday Nights", 3.61);
-        albums.add(album); // add first album to the album list
+        printInstruction();
 
-        //Create another album
-        album = new Album("KIRK", "DaBaby");
-        album.addNewSong("Intro", 3.11);
-        album.addNewSong("Suge", 4.10);
-        album.addNewSong("BOP", 3.56);
-        album.addNewSong("RAW SHIT", 3.71);
-        albums.add(album); // add the second album to the album list
-
-        LinkedList<Song> playList = new LinkedList<Song>();
-        albums.get(0).addToPlayList("Talk", playList);
-        albums.get(0).addToPlayList("Better", playList);
-        albums.get(0).addToPlayList("Boo'd Up", playList); //Does not exist
-        albums.get(0).addToPlayList(2, playList); //Using the track numbers to add songs
-
-        albums.get(1).addToPlayList(1, playList);
-        albums.get(1).addToPlayList(2, playList);
-        albums.get(1).addToPlayList(18, playList); // There is no track 18
-
-        play(playList);
-
-    }
-
-    private static void play(LinkedList<Song> playList) {
-        Scanner scanner = new Scanner(System.in);
-        boolean appMenu = false;
-        boolean forward = true;
-
-        ListIterator<Song> listIterator = playList.listIterator();
-        if (playList.size() == 0) {
-            System.out.println("No song in playlist");
-        }else {
-            System.out.println("Now playing " + listIterator.next().toString());
-            printAppMenuOption();
-        }
-
-        while(!appMenu) {
-            int selection = scanner.nextInt();
+        while(!quit) {
+            System.out.println("Enter your choice: ");
+            choice = scanner.nextInt();
             scanner.nextLine();
 
-            switch (selection) {
+            switch(choice) {
                 case 0:
-                    System.out.println("Playlist Ready");
-                    appMenu = true;
+                    printInstruction();
                     break;
                 case 1:
-                    if(!forward) {
-                        if(listIterator.hasNext()) {
-                            listIterator.next();
-                        }
-                        forward = true;
-                    }
-                    if (listIterator.hasNext()) {
-                        System.out.println("Now playing " + listIterator.next().toString());
-                    } else {
-                        System.out.println("We've reached the end of the playlist");
-                        forward = false;
-                    }
+                    groceryList.printGroceryList();
                     break;
                 case 2:
-                    if (forward) {
-                        if (listIterator.hasPrevious()) {
-                            listIterator.previous();
-                        }
-                        forward = false;
-                    }
-                    if (listIterator.hasPrevious()) {
-                        System.out.println("Now playing " + listIterator.previous().toString());
-                    }else {
-                        System.out.println("We're at the start of the playlist");
-                        forward = true;
-                    }
+                    addItem();
                     break;
                 case 3:
-                    if (forward) {
-                        if (listIterator.hasPrevious()) {
-                            System.out.println("Now replaying " + listIterator.previous().toString());
-                            forward = false;
-                        }else {
-                            System.out.println("We're at the start of the list");
-                        }
-                    }else {
-                        if (listIterator.hasNext()) {
-                            System.out.println("Now replaying " + listIterator.next().toString());
-                            forward = true;
-                        }else {
-                            System.out.println("We've reached the end of the list");
-                        }
-                    }
+                    modifyItem();
                     break;
                 case 4:
-                    printList(playList);
+                    removeItem();
                     break;
                 case 5:
-                    printAppMenuOption();
+                    searchItem();
                     break;
                 case 6:
-                    if (playList.size() > 0) {
-                        listIterator.remove();
-                        if (listIterator.hasNext()) {
-                            System.out.println("Now playing " + listIterator.next());
-                        }else if(listIterator.hasPrevious()) {
-                            System.out.println("Now playing " + listIterator.previous());
-                        }
-                    }
+                    processArrayList();
+                    break;
+                case 7:
+                    quit = true;
                     break;
             }
         }
     }
 
-    private static void printAppMenuOption() {
-        System.out.println("Available options:\npress");
-        System.out.println("0 - to quit\n" +
-                "1 - to play next song\n" +
-                "2 - to play the previous song\n" +
-                "3 - to replay the current song\n" +
-                "4 - to list available songs in the playlist\n" +
-                "5 - to print available options.\n" +
-                "6 - to delete current song from the playlist");
+    public static void printInstruction() {
+        System.out.println("\nPress ");
+        System.out.println("\t 0 - To print choice options.");
+        System.out.println("\t 1 - To print list of grocery items.");
+        System.out.println("\t 2 - To add an item to the list.");
+        System.out.println("\t 3 - To modify an item in the list.");
+        System.out.println("\t 4 - To remove an item from the list.");
+        System.out.println("\t 5 - To search for an item in the list.");
+        System.out.println("\t 6 - To quit the application.");
     }
 
-    private static void printList(LinkedList<Song> playList) {
-        Iterator<Song> iterator = playList.iterator();
-        System.out.println("===================================");
-        while(iterator.hasNext()) {
-            System.out.println(iterator.next().toString());
+    public static void addItem() {
+        System.out.println("Please enter the grocery item: ");
+        groceryList.addGroceryItem(scanner.nextLine());
+    }
+
+    public static void modifyItem() {
+        System.out.println("Enter current item name: ");
+        String itemNo = scanner.nextLine();
+        System.out.println("Enter new item: ");
+        String newItem = scanner.nextLine();
+        groceryList.modifyGroceryItem(itemNo, newItem);
+    }
+
+    public static void removeItem() {
+        System.out.println("Enter item name: ");
+        String itemNo = scanner.nextLine();
+        scanner.nextLine();
+        groceryList.removeGroceryItem(itemNo);
+    }
+
+    public static void searchItem() {
+        System.out.println("Enter item to search for: ");
+        String searchItem = scanner.nextLine();
+        if(groceryList.onFile(searchItem)) {
+            System.out.println("Found " + searchItem + " in our grocery list.");
+        }else {
+            System.out.println(searchItem + " is not in the shopping list.");
         }
-        System.out.println("===================================");
+    }
+
+    public static void processArrayList() {
+        ArrayList<String> newArrary = new ArrayList<String>();
+        newArrary.addAll(groceryList.getGroceryList());
+
+        ArrayList<String> nextArray = new ArrayList<String>(groceryList.getGroceryList());
+
+        String[] myArray = new String[groceryList.getGroceryList().size()];
+        myArray = groceryList.getGroceryList().toArray(myArray);
     }
 }
